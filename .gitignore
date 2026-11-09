@@ -1,0 +1,11 @@
+.env
+*.swp
+*.swo
+*~
+.DS_Store
+.vscode/
+.idea/
+mariadb_data/
+moodle_data/
+moodledata_data/
+*.log
