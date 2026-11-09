@@ -18,26 +18,30 @@ services:
       retries: 6
 
   moodle:
-    image: docker.io/bitnami/moodle:4.5
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - '${MOODLE_PORT}:8080'
+      - '${MOODLE_PORT}:80'
     environment:
-      - MOODLE_DATABASE_TYPE=${MOODLE_DATABASE_TYPE}
-      - MOODLE_DATABASE_HOST=${MOODLE_DATABASE_HOST}
-      - MOODLE_DATABASE_PORT_NUMBER=${MOODLE_DATABASE_PORT}
-      - MOODLE_DATABASE_NAME=${MOODLE_DB_NAME}
-      - MOODLE_DATABASE_USER=${MOODLE_DB_USER}
-      - MOODLE_DATABASE_PASSWORD=${MOODLE_DB_PASSWORD}
-      - MOODLE_HOST=${MOODLE_HOST}
-      - MOODLE_USERNAME=${MOODLE_ADMIN_USER}
-      - MOODLE_PASSWORD=${MOODLE_ADMIN_PASSWORD}
-      - MOODLE_EMAIL=${MOODLE_ADMIN_EMAIL}
+      - MOODLE_DATABASE_TYPE=mariadb
+      - MOODLE_DATABASE_HOST=mariadb
+      - MOODLE_DATABASE_PORT=${MOODLE_DATABASE_PORT}
+      - MOODLE_DB_NAME=${MOODLE_DB_NAME}
+      - MOODLE_DB_USER=${MOODLE_DB_USER}
+      - MOODLE_DB_PASSWORD=${MOODLE_DB_PASSWORD}
+      - MOODLE_ADMIN_USER=${MOODLE_ADMIN_USER}
+      - MOODLE_ADMIN_PASSWORD=${MOODLE_ADMIN_PASSWORD}
+      - MOODLE_ADMIN_EMAIL=${MOODLE_ADMIN_EMAIL}
       - MOODLE_SITE_NAME=${MOODLE_SITE_NAME}
-      - MOODLE_SKIP_BOOTSTRAP=no
-      - MOODLE_SKIP_INSTALL=no
+      - MOODLE_HOST=${MOODLE_HOST}
+      - MOODLE_PORT=${MOODLE_PORT}
+      - MOODLE_STUDENT_USER=${MOODLE_STUDENT_USER}
+      - MOODLE_STUDENT_PASSWORD=${MOODLE_STUDENT_PASSWORD}
+      - MOODLE_STUDENT_EMAIL=${MOODLE_STUDENT_EMAIL}
     volumes:
-      - 'moodle_data:/bitnami/moodle'
-      - 'moodledata_data:/bitnami/moodledata'
+      - 'moodle_data:/var/www/html'
+      - 'moodledata_data:/var/www/moodledata'
       - './scripts:/scripts:ro'
     depends_on:
       mariadb:
@@ -45,7 +49,7 @@ services:
     networks:
       - moodle-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8080/login/index.php']
+      test: ['CMD', 'curl', '-f', 'http://localhost/login/index.php']
       interval: 30s
       timeout: 10s
       retries: 10

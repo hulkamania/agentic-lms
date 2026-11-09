@@ -4,7 +4,7 @@
  */
 
 define('CLI_SCRIPT', true);
-require_once('/bitnami/moodle/config.php');
+require_once('/var/www/html/config.php');
 require_once($CFG->dirroot . '/course/lib.php');
 require_once($CFG->dirroot . '/course/modlib.php');
 require_once($CFG->dirroot . '/mod/page/lib.php');
@@ -650,31 +650,6 @@ foreach ($sections as $sectionnum => $sectiondata) {
         }
     }
 }
-
-// ------------------------------------------------------------------
-// 4. Save credentials
-// ------------------------------------------------------------------
-$home = getenv('HOME') ?: '/tmp';
-$credfile = "$home/.moodle.creds";
-$student_user = getenv('MOODLE_STUDENT_USER') ?: 'student';
-$student_pass = getenv('MOODLE_STUDENT_PASSWORD') ?: 'StudentPass123!';
-$admin_user   = getenv('MOODLE_ADMIN_USER') ?: 'admin';
-$admin_pass   = getenv('MOODLE_ADMIN_PASSWORD') ?: 'AdminPass123!';
-
-$content = <<<CREDS
-# Moodle Credentials for Agentic LMS
-# Generated: $(date)
-ADMIN_USER=$admin_user
-ADMIN_PASS=$admin_pass
-STUDENT_USER=$student_user
-STUDENT_PASS=$student_pass
-MOODLE_URL=http://localhost:8080
-COURSE_SHORTNAME=LMSPM2024
-CREDS;
-
-file_put_contents($credfile, $content);
-chmod($credfile, 0600);
-echo "Credentials saved to $credfile\n";
 
 echo "\n=== Learning Path Creation Complete ===\n";
 echo "Course URL: http://localhost:8080/course/view.php?id=$course->id\n";

@@ -4,7 +4,7 @@
  */
 
 define('CLI_SCRIPT', true);
-require_once('/bitnami/moodle/config.php');
+require_once('/var/www/html/config.php');
 require_once($CFG->dirroot . '/user/lib.php');
 
 $student_username = getenv('MOODLE_STUDENT_USER') ?: 'student';
