@@ -42,7 +42,7 @@ services:
     volumes:
       - 'moodle_data:/var/www/html'
       - 'moodledata_data:/var/www/moodledata'
-      - './scripts:/scripts:ro'
+      - './scripts:/scripts'
     depends_on:
       mariadb:
         condition: service_healthy

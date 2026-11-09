@@ -61,22 +61,11 @@ function add_page_to_section($course, $sectionnum, $title, $content) {
 
     $module = $DB->get_record('modules', ['name' => 'page'], '*', MUST_EXIST);
 
-    $page = new stdClass();
-    $page->course        = $course->id;
-    $page->name          = $title;
-    $page->intro         = '';
-    $page->introformat   = FORMAT_HTML;
-    $page->content       = $content;
-    $page->contentformat = FORMAT_HTML;
-    $page->display       = 0;
-    $page->legacyfiles   = 0;
-    $page->revision      = 1;
-    $page->timemodified  = time();
-
+    // First create the course module record
     $cm = new stdClass();
     $cm->course           = $course->id;
     $cm->module           = $module->id;
-    $cm->instance         = 0; // set later
+    $cm->instance         = 0;
     $cm->section          = $sectionnum;
     $cm->visible          = 1;
     $cm->visibleold       = 1;
@@ -89,16 +78,41 @@ function add_page_to_section($course, $sectionnum, $title, $content) {
     $cm->completionexpected = 0;
     $cm->showdescription  = 0;
 
-    $page->id = page_add_instance($page, $cm);
+    $cmid = add_course_module($cm);
+    if (!$cmid) {
+        echo "  ERROR creating course module for '$title'\n";
+        return false;
+    }
+
+    // Now create the page instance
+    $page = new stdClass();
+    $page->course        = $course->id;
+    $page->coursemodule  = $cmid;
+    $page->name          = $title;
+    $page->intro         = '';
+    $page->introformat   = FORMAT_HTML;
+    $page->content       = $content;
+    $page->contentformat = FORMAT_HTML;
+    $page->display       = 0;
+    $page->legacyfiles   = 0;
+    $page->revision      = 1;
+    $page->timemodified  = time();
+    $page->printintro    = 0;
+    $page->printlastmodified = 1;
+
+    try {
+        $page->id = page_add_instance($page, null);
+    } catch (Exception $e) {
+        echo "  ERROR creating page '$title': " . $e->getMessage() . "\n";
+        return false;
+    }
+
     if (!$page->id) {
         echo "  ERROR creating page '$title'\n";
         return false;
     }
 
-    $cm->instance = $page->id;
-    $cm->id = add_course_module($cm);
-    course_add_cm_to_section($course->id, $cm->id, $sectionnum);
-
+    course_add_cm_to_section($course->id, $cmid, $sectionnum);
     rebuild_course_cache($course->id, true);
     echo "  Added page: $title (section $sectionnum)\n";
     return true;
@@ -112,29 +126,41 @@ function add_label_to_section($course, $sectionnum, $content) {
 
     $module = $DB->get_record('modules', ['name' => 'label'], '*', MUST_EXIST);
 
+    // First create the course module record
+    $cm = new stdClass();
+    $cm->course   = $course->id;
+    $cm->module   = $module->id;
+    $cm->instance = 0;
+    $cm->section  = $sectionnum;
+    $cm->visible  = 1;
+
+    $cmid = add_course_module($cm);
+    if (!$cmid) {
+        echo "  ERROR creating course module for label\n";
+        return false;
+    }
+
     $label = new stdClass();
     $label->course      = $course->id;
+    $label->coursemodule = $cmid;
     $label->name        = 'Overview';
     $label->intro       = $content;
     $label->introformat = FORMAT_HTML;
     $label->timemodified = time();
 
-    $cm = new stdClass();
-    $cm->course   = $course->id;
-    $cm->module   = $module->id;
-    $cm->section  = $sectionnum;
-    $cm->visible  = 1;
+    try {
+        $label->id = label_add_instance($label);
+    } catch (Exception $e) {
+        echo "  ERROR creating label: " . $e->getMessage() . "\n";
+        return false;
+    }
 
-    $label->id = label_add_instance($label, $cm);
     if (!$label->id) {
         echo "  ERROR creating label\n";
         return false;
     }
 
-    $cm->instance = $label->id;
-    $cm->id = add_course_module($cm);
-    course_add_cm_to_section($course->id, $cm->id, $sectionnum);
-
+    course_add_cm_to_section($course->id, $cmid, $sectionnum);
     rebuild_course_cache($course->id, true);
     echo "  Added label to section $sectionnum\n";
     return true;

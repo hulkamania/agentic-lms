@@ -88,7 +88,7 @@ EOF
     chown "$APACHE_USER:$APACHE_USER" "$MOODLE_DIR/config.php"
 
     # Run CLI install
-    sudo -u "$APACHE_USER" php "$MOODLE_DIR/admin/cli/install.php" \
+    php "$MOODLE_DIR/admin/cli/install.php" \
         --lang=en \
         --chmod=2777 \
         --wwwroot="$WEB_URL" \
@@ -127,7 +127,7 @@ if [ -d /scripts ]; then
     for f in /scripts/*.php; do
         [ -e "$f" ] || continue
         echo "Running init PHP: $f"
-        sudo -u "$APACHE_USER" php "$f" || true
+        php "$f" || true
     done
 fi
 

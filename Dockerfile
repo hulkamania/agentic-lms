@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
+    sudo \
     libonig-dev \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
