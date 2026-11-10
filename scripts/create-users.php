@@ -21,7 +21,8 @@ if ($existing) {
 
 $user = new stdClass();
 $user->username   = $student_username;
-$user->password   = hash_internal_user_password($student_password);
+// Pass PLAINTEXT: user_create_user() checks the policy and hashes it internally.
+$user->password   = $student_password;
 $user->firstname  = 'Student';
 $user->lastname   = 'Learner';
 $user->email      = $student_email;
