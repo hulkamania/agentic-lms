@@ -1,0 +1,12 @@
+[Unit]
+Description=Alias 192.168.254.101 on loopback interface
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/ip addr add 192.168.254.101/32 dev lo
+ExecStop=/usr/sbin/ip addr del 192.168.254.101/32 dev lo
+
+[Install]
+WantedBy=multi-user.target

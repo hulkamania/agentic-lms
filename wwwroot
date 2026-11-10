@@ -1,0 +1,14 @@
+$CFG->dbtype    = 'mariadb';
+$CFG->dblibrary = 'native';
+$CFG->dbhost    = 'mariadb';
+$CFG->dbname    = 'moodle';
+$CFG->dbuser    = 'moodle';
+$CFG->dbpass    = 'MoodleDBSecret2024';
+$CFG->prefix    = 'mdl_';
+$CFG->dboptions = array(
+$CFG->wwwroot   = 'http://192.168.254.101:8080';
+$CFG->dataroot  = '/var/www/moodledata';
+$CFG->admin     = 'admin';
+$CFG->dirroot   = '/var/www/html';
+$CFG->directorypermissions = 02777;
+require_once($CFG->dirroot . '/lib/setup.php');
