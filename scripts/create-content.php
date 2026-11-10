@@ -53,6 +53,21 @@ if ($editingteacher) {
     role_assign($editingteacher->id, $admin->id, $context->id);
 }
 
+// Enrol the student in the course via the manual enrol plugin (idempotent).
+$student = $DB->get_record('user', ['username' => getenv('MOODLE_STUDENT_USER') ?: 'student']);
+if ($student) {
+    $manualinst = null;
+    foreach (enrol_get_instances($course->id, true) as $e) {
+        if ($e->enrol === 'manual') { $manualinst = $e; break; }
+    }
+    if ($manualinst && !$DB->record_exists('user_enrolments', ['enrolid' => $manualinst->id, 'userid' => $student->id])) {
+        $studentrole = $DB->get_record('role', ['shortname' => 'student']);
+        $manual = enrol_get_plugin('manual');
+        $manual->enrol_user($manualinst, $student->id, $studentrole ? (int)$studentrole->id : 5, 0, 0, ENROL_USER_ACTIVE);
+        echo "Enrolled student (id=$student->id) in course $course->id.\n";
+    }
+}
+
 // ------------------------------------------------------------------
 // Helper: add a Page resource to a section
 // ------------------------------------------------------------------
